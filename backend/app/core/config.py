@@ -6,6 +6,9 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     api_v1_prefix: str = "/api/v1"
     database_url: str | None = None
+    jwt_secret_key: str = "change-this-jwt-secret"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
 
     postgres_user: str = "postgres"
     postgres_password: str = "postgres"
@@ -28,6 +31,13 @@ class Settings(BaseSettings):
             f"postgresql+psycopg2://{self.postgres_user}:{self.postgres_password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
+
+    def validate_runtime_security(self) -> None:
+        if self.jwt_secret_key == "change-this-jwt-secret":
+            raise RuntimeError(
+                "JWT_SECRET_KEY is using the insecure default value. "
+                "Set a real secret before starting the API."
+            )
 
 
 settings = Settings()

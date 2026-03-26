@@ -1,1 +1,1 @@
-"""Authentication package placeholder."""
+"""Authentication helpers."""
