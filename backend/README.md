@@ -67,6 +67,8 @@ backend/
 - script de seed para admin inicial
 - camada simples em `services/` para consultas de analytics
 - endpoints protegidos de KPI e filtros principais
+- tratamento padronizado de erros com handlers globais
+- logging estruturado basico para startup e erros tratados
 
 ## Regras do modelo Shipment
 
@@ -280,5 +282,5 @@ Regras calculadas:
 
 ## Proxima evolucao natural
 
-- adicionar logs e tratamento padronizado de erros
+- expandir cobertura de testes para cenarios adicionais de erro e observabilidade
 - expandir a camada simples de `services/` para regras de negocio e agregacoes adicionais

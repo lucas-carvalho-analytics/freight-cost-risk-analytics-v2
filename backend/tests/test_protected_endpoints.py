@@ -29,7 +29,11 @@ def test_kpi_endpoint_without_token_returns_401(client, sample_shipments) -> Non
     response = client.get("/api/v1/kpis/frete-total")
 
     assert response.status_code == 401
-    assert response.json()["detail"] == "Not authenticated."
+    assert response.json() == {
+        "error": "http_error",
+        "message": "Not authenticated.",
+        "status_code": 401,
+    }
 
 
 def test_filter_endpoint_with_valid_token_returns_filtered_options(
