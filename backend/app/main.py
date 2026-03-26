@@ -4,6 +4,8 @@ from app.api.router import api_router
 from app.core.config import settings
 
 
+settings.validate_runtime_security()
+
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,

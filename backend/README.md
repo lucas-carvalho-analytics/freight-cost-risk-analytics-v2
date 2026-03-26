@@ -10,11 +10,14 @@ backend/
 │   ├── api/
 │   │   ├── v1/
 │   │   │   ├── __init__.py
+│   │   │   ├── auth.py
 │   │   │   └── health.py
 │   │   ├── __init__.py
 │   │   └── router.py
 │   ├── auth/
-│   │   └── __init__.py
+│   │   ├── __init__.py
+│   │   ├── dependencies.py
+│   │   └── security.py
 │   ├── core/
 │   │   ├── __init__.py
 │   │   └── config.py
@@ -29,9 +32,11 @@ backend/
 │   │   └── user.py
 │   ├── scripts/
 │   │   ├── __init__.py
-│   │   └── import_shipments.py
+│   │   ├── import_shipments.py
+│   │   └── seed_admin.py
 │   ├── schemas/
-│   │   └── __init__.py
+│   │   ├── __init__.py
+│   │   └── auth.py
 │   ├── services/
 │   │   └── __init__.py
 │   ├── __init__.py
@@ -58,6 +63,8 @@ backend/
 - migration inicial com Alembic
 - sessao de banco com SQLAlchemy 2
 - script de ingestao CSV para `shipments`
+- autenticacao JWT basica com login e endpoint protegido
+- script de seed para admin inicial
 
 ## Regras do modelo Shipment
 
@@ -75,6 +82,7 @@ backend/
 1. Configure as variaveis de ambiente.
 
    O projeto aceita `.env` dentro de `backend/` e tambem o `.env` na raiz do repositorio.
+   Defina `JWT_SECRET_KEY` com um valor real antes de iniciar a API.
    Se quiser usar o arquivo de exemplo:
 
    ```bash
@@ -131,7 +139,19 @@ backend/
    python -m app.scripts.import_shipments .\caminho\para\arquivo.csv
    ```
 
-7. Inicie a API:
+7. Crie o admin inicial:
+
+   ```bash
+   python -m app.scripts.seed_admin --email admin@example.com --full-name "Admin"
+   ```
+
+   No PowerShell:
+
+   ```powershell
+   python -m app.scripts.seed_admin --email admin@example.com --full-name "Admin"
+   ```
+
+8. Inicie a API:
 
    ```bash
    uvicorn app.main:app --reload
@@ -164,6 +184,8 @@ Regras aplicadas no import:
 ## Endpoints iniciais
 
 - `GET /api/v1/health`
+- `POST /api/v1/auth/login`
+- `GET /api/v1/auth/me`
 
 Exemplo de resposta:
 
@@ -174,6 +196,38 @@ Exemplo de resposta:
   "version": "0.1.0"
 }
 ```
+
+## Autenticacao
+
+Criar admin inicial:
+
+```bash
+python -m app.scripts.seed_admin --email admin@example.com --full-name "Admin"
+```
+
+O script vai pedir a senha de forma segura no terminal e solicitar confirmacao.
+
+Exemplo de login:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"admin@example.com\",\"password\":\"Admin123!\"}"
+```
+
+Exemplo de uso do token:
+
+```bash
+curl http://127.0.0.1:8000/api/v1/auth/me \
+  -H "Authorization: Bearer SEU_TOKEN"
+```
+
+No Swagger:
+
+- faca login no `POST /api/v1/auth/login`
+- copie o `access_token`
+- clique em `Authorize`
+- cole `Bearer SEU_TOKEN`
 
 ## Proxima evolucao natural
 
