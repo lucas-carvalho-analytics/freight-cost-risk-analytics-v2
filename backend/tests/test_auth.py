@@ -23,7 +23,11 @@ def test_login_with_invalid_credentials_returns_401(client, test_user) -> None:
     )
 
     assert response.status_code == 401
-    assert response.json()["detail"] == "Invalid credentials."
+    assert response.json() == {
+        "error": "http_error",
+        "message": "Invalid credentials.",
+        "status_code": 401,
+    }
 
 
 def test_auth_me_with_valid_token_returns_current_user(client, test_user, auth_headers) -> None:
@@ -40,7 +44,11 @@ def test_auth_me_without_token_returns_401(client) -> None:
     response = client.get("/api/v1/auth/me")
 
     assert response.status_code == 401
-    assert response.json()["detail"] == "Not authenticated."
+    assert response.json() == {
+        "error": "http_error",
+        "message": "Not authenticated.",
+        "status_code": 401,
+    }
 
 
 def test_auth_me_with_invalid_token_returns_401(client) -> None:
@@ -50,7 +58,11 @@ def test_auth_me_with_invalid_token_returns_401(client) -> None:
     )
 
     assert response.status_code == 401
-    assert response.json()["detail"] == "Invalid or expired token."
+    assert response.json() == {
+        "error": "http_error",
+        "message": "Invalid or expired token.",
+        "status_code": 401,
+    }
 
 
 def test_login_registers_audit_log(client, test_user, db_session) -> None:

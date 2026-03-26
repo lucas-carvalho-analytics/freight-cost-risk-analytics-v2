@@ -61,7 +61,7 @@ def client(session_local) -> TestClient:
             db.close()
 
     app.dependency_overrides[get_db] = override_get_db
-    with TestClient(app) as test_client:
+    with TestClient(app, raise_server_exceptions=False) as test_client:
         yield test_client
     app.dependency_overrides.clear()
 
@@ -136,3 +136,19 @@ def sample_shipments(db_session: Session) -> list[Shipment]:
     db_session.add_all(shipments)
     db_session.commit()
     return shipments
+
+
+@pytest.fixture
+def internal_error_route():
+    def raise_internal_error():
+        raise RuntimeError("simulated internal error")
+
+    route_path = "/api/v1/test/internal-error"
+    app.router.add_api_route(route_path, raise_internal_error, methods=["GET"])
+
+    try:
+        yield route_path
+    finally:
+        app.router.routes = [
+            route for route in app.router.routes if getattr(route, "path", None) != route_path
+        ]
