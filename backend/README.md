@@ -65,6 +65,8 @@ backend/
 - script de ingestao CSV para `shipments`
 - autenticacao JWT basica com login e endpoint protegido
 - script de seed para admin inicial
+- camada simples em `services/` para consultas de analytics
+- endpoints protegidos de KPI e filtros principais
 
 ## Regras do modelo Shipment
 
@@ -186,6 +188,15 @@ Regras aplicadas no import:
 - `GET /api/v1/health`
 - `POST /api/v1/auth/login`
 - `GET /api/v1/auth/me`
+- `GET /api/v1/kpis/frete-total`
+- `GET /api/v1/kpis/advalorem-total`
+- `GET /api/v1/kpis/taxa-ocorrencias`
+- `GET /api/v1/kpis/custo-por-transportadora`
+- `GET /api/v1/kpis/custo-risco-destino`
+- `GET /api/v1/filtros/origens`
+- `GET /api/v1/filtros/destinos`
+- `GET /api/v1/filtros/transportadoras`
+- `GET /api/v1/filtros/tipos-veiculo`
 
 Exemplo de resposta:
 
@@ -229,8 +240,45 @@ No Swagger:
 - clique em `Authorize`
 - cole `Bearer SEU_TOKEN`
 
+## KPIs e filtros
+
+Todos os endpoints de KPI e filtros exigem Bearer token.
+
+Filtros opcionais suportados via query params:
+
+- `data_inicio`
+- `data_fim`
+- `origem`
+- `destino`
+- `transportadora`
+- `tipo_veiculo`
+- `ocorrencia`
+
+Exemplo de KPI com filtros:
+
+```bash
+curl "http://127.0.0.1:8000/api/v1/kpis/frete-total?origem=Suape&transportadora=Belmont-Alpha&ocorrencia=ok" \
+  -H "Authorization: Bearer SEU_TOKEN"
+```
+
+Exemplo de endpoint de filtros:
+
+```bash
+curl "http://127.0.0.1:8000/api/v1/filtros/destinos?origem=Jaboat%C3%A3o&transportadora=Trans-X" \
+  -H "Authorization: Bearer SEU_TOKEN"
+```
+
+Regras calculadas:
+
+- `frete-total`: soma de `frete_peso`
+- `advalorem-total`: soma de `ad_valorem`
+- `taxa-ocorrencias`: percentual de shipments com `tem_ocorrencia = true`
+- `custo-por-transportadora`: `avg(frete_peso)` e quantidade de shipments por transportadora
+- `custo-risco-destino`: `custo_medio`, `taxa_ocorrencia_pct` e `score_risco` heuristico
+- `score_risco = custo_medio_normalizado * 0.4 + taxa_ocorrencia_normalizada * 0.6`
+- endpoints de filtros ignoram o filtro do proprio campo para listar opcoes mais uteis na interface
+
 ## Proxima evolucao natural
 
-- criar schemas Pydantic para os modelos iniciais
 - adicionar logs e tratamento padronizado de erros
-- iniciar camada de repositorio ou services para regras de negocio
+- expandir a camada simples de `services/` para regras de negocio e agregacoes adicionais
