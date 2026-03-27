@@ -19,7 +19,7 @@ export function DestinationRiskChart({ data }: DestinationRiskChartProps) {
     .slice(0, 5)
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-950/5">
+    <section className="min-w-0 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-950/5">
       <div>
         <p className="text-sm font-medium text-slate-500">Gráfico 2</p>
         <h2 className="mt-2 text-xl font-semibold text-slate-950">
@@ -31,7 +31,7 @@ export function DestinationRiskChart({ data }: DestinationRiskChartProps) {
         </p>
       </div>
 
-      <div className="mt-6 h-80">
+      <div className="mt-6 h-80 min-w-0">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={topDestinations} layout="vertical" margin={{ top: 8, right: 20, left: 30, bottom: 0 }}>
             <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" horizontal={false} />
