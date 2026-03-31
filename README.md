@@ -216,6 +216,19 @@ Guia curto:
 
 - [docs/ci-cd-foundation.md](./docs/ci-cd-foundation.md)
 
+## Container smoke tests foundation
+
+Existe agora tambem uma validacao basica de stack com containers para o ambiente de demo:
+
+- sobe o stack de demo de forma automatizavel
+- valida frontend servido
+- valida `health` e `ready` via compose
+- derruba o ambiente ao final
+
+Guia curto:
+
+- [docs/container-smoke-tests-foundation.md](./docs/container-smoke-tests-foundation.md)
+
 ## Validacao e testes
 
 Checklist operacional por branch:

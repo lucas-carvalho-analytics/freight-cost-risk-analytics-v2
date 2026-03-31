@@ -76,3 +76,19 @@ jobs:
 
       - name: Validate production foundation compose
         run: docker compose --env-file deploy/production.env.example -f docker-compose.production-foundation.yml config > /dev/null
+
+  demo-stack-smoke:
+    name: Demo Stack Smoke Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Run demo stack smoke test
+        run: python scripts/smoke_test_demo_stack.py
