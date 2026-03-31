@@ -84,3 +84,4 @@ Quando `APP_ENV=production`:
 ## Leitura complementar
 
 - [docs/deploy-demo.md](./deploy-demo.md)
+- [docs/secrets-and-operational-config.md](./secrets-and-operational-config.md)

@@ -178,6 +178,18 @@ Guia curto:
 
 - [docs/production-readiness.md](./docs/production-readiness.md)
 
+## Secrets and operational config
+
+Existe tambem uma base curta para contratos de env e tratamento de secrets por ambiente:
+
+- `development`, `demo` e `production foundation` agora ficam mais explicitos
+- placeholders inseguros falham mais cedo em cenarios criticos
+- a documentacao deixa claro o que e obrigatorio e como rotacionar secrets basicos
+
+Guia curto:
+
+- [docs/secrets-and-operational-config.md](./docs/secrets-and-operational-config.md)
+
 ## Validacao e testes
 
 Checklist operacional por branch:

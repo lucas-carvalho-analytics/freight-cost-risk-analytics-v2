@@ -25,6 +25,23 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
+    @staticmethod
+    def _is_placeholder_secret(value: str) -> bool:
+        placeholders = {
+            "change-this-jwt-secret",
+            "replace-with-a-long-random-secret-for-demo",
+            "replace-with-a-long-random-secret-with-at-least-32-characters",
+        }
+        return value in placeholders
+
+    @staticmethod
+    def _is_unsafe_postgres_password(value: str) -> bool:
+        unsafe_passwords = {
+            "postgres",
+            "replace-with-a-strong-password",
+        }
+        return value in unsafe_passwords
+
     @property
     def resolved_database_url(self) -> str:
         if self.database_url:
@@ -42,14 +59,34 @@ class Settings(BaseSettings):
                 "Set a real secret before starting the API."
             )
 
-        if self.app_env.lower() == "production":
-            if len(self.jwt_secret_key) < 32:
-                raise RuntimeError(
-                    "JWT_SECRET_KEY must have at least 32 characters in production."
-                )
+        app_env = self.app_env.lower()
+
+        if app_env in {"demo", "production"} and self._is_placeholder_secret(
+            self.jwt_secret_key
+        ):
+            raise RuntimeError(
+                "JWT_SECRET_KEY is still using a placeholder value for demo/production."
+            )
+
+        if app_env in {"demo", "production"} and len(self.jwt_secret_key) < 32:
+            raise RuntimeError(
+                "JWT_SECRET_KEY must have at least 32 characters in demo/production."
+            )
+
+        if self.access_token_expire_minutes < 5:
+            raise RuntimeError(
+                "ACCESS_TOKEN_EXPIRE_MINUTES must be greater than or equal to 5."
+            )
+
+        if app_env == "production":
             if self.web_concurrency < 1:
                 raise RuntimeError(
                     "WEB_CONCURRENCY must be greater than or equal to 1."
+                )
+            if self._is_unsafe_postgres_password(self.postgres_password):
+                raise RuntimeError(
+                    "POSTGRES_PASSWORD is using an unsafe placeholder/default value "
+                    "for production."
                 )
 
 
