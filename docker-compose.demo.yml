@@ -23,6 +23,7 @@ services:
       dockerfile: Dockerfile.demo
     restart: unless-stopped
     environment:
+      APP_ENV: ${APP_ENV:-demo}
       APP_NAME: ${APP_NAME:-freight_cost_risk_analytics}
       APP_VERSION: ${APP_VERSION:-0.1.0}
       API_V1_PREFIX: ${API_V1_PREFIX:-/api/v1}
@@ -35,6 +36,7 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     depends_on:
       postgres:
         condition: service_healthy
