@@ -4,6 +4,18 @@ from datetime import datetime, timezone
 
 
 class JsonFormatter(logging.Formatter):
+    def __init__(
+        self,
+        *,
+        app_name: str,
+        app_env: str,
+        app_version: str,
+    ) -> None:
+        super().__init__()
+        self.app_name = app_name
+        self.app_env = app_env
+        self.app_version = app_version
+
     _default_fields = {
         "name",
         "msg",
@@ -34,6 +46,9 @@ class JsonFormatter(logging.Formatter):
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "level": record.levelname,
             "logger": record.name,
+            "service": self.app_name,
+            "environment": self.app_env,
+            "version": self.app_version,
             "message": record.getMessage(),
         }
 
@@ -51,15 +66,30 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(payload, ensure_ascii=False, default=str)
 
 
-def setup_logging() -> None:
+def setup_logging(
+    *,
+    app_name: str,
+    app_env: str,
+    app_version: str,
+    log_level: str,
+) -> None:
     root_logger = logging.getLogger()
+    level = getattr(logging, log_level.upper(), logging.INFO)
+
     if root_logger.handlers:
+        root_logger.setLevel(level)
         return
 
     handler = logging.StreamHandler()
-    handler.setFormatter(JsonFormatter())
+    handler.setFormatter(
+        JsonFormatter(
+            app_name=app_name,
+            app_env=app_env,
+            app_version=app_version,
+        )
+    )
     root_logger.addHandler(handler)
-    root_logger.setLevel(logging.INFO)
+    root_logger.setLevel(level)
 
 
 def get_logger(name: str) -> logging.Logger:

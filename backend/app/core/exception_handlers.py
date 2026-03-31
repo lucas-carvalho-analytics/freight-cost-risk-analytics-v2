@@ -9,6 +9,10 @@ from app.core.logging import get_logger
 logger = get_logger(__name__)
 
 
+def _request_id_from(request: Request) -> str | None:
+    return getattr(request.state, "request_id", None)
+
+
 def build_error_response(
     *,
     error: str,
@@ -38,6 +42,8 @@ async def http_exception_handler(
     log_method(
         "HTTP exception handled",
         extra={
+            "event": "http_exception",
+            "request_id": _request_id_from(request),
             "path": request.url.path,
             "method": request.method,
             "status_code": exc.status_code,
@@ -60,6 +66,8 @@ async def validation_exception_handler(
     logger.warning(
         "Request validation error handled",
         extra={
+            "event": "validation_exception",
+            "request_id": _request_id_from(request),
             "path": request.url.path,
             "method": request.method,
             "status_code": 422,
@@ -81,6 +89,8 @@ async def unhandled_exception_handler(
     logger.exception(
         "Unhandled exception",
         extra={
+            "event": "unhandled_exception",
+            "request_id": _request_id_from(request),
             "path": request.url.path,
             "method": request.method,
             "status_code": 500,
