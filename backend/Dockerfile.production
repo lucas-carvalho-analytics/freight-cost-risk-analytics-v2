@@ -14,7 +14,8 @@ COPY app ./app
 COPY docker/runtime-entrypoint.sh /runtime-entrypoint.sh
 COPY docker/migrate.sh /migrate.sh
 
-RUN chmod +x /runtime-entrypoint.sh /migrate.sh
+RUN sed -i 's/\r$//' /runtime-entrypoint.sh /migrate.sh \
+    && chmod +x /runtime-entrypoint.sh /migrate.sh
 
 EXPOSE 8000
 

@@ -13,7 +13,7 @@ COPY alembic ./alembic
 COPY app ./app
 COPY docker/demo-entrypoint.sh /demo-entrypoint.sh
 
-RUN chmod +x /demo-entrypoint.sh
+RUN sed -i 's/\r$//' /demo-entrypoint.sh && chmod +x /demo-entrypoint.sh
 
 EXPOSE 8000
 
