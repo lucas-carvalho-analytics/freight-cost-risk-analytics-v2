@@ -1,17 +1,19 @@
 # freight-cost-risk-analytics-v2
 
-Backend MVP para analytics logístico com foco em custos de frete, ad valorem, ocorrências e exploração de indicadores via API protegida.
+Aplicacao full-stack para analytics logistico com foco em custos de frete, ad valorem, ocorrencias e exploracao de indicadores via API protegida e dashboard web.
 
-## Visão do projeto
+## Visao do projeto
 
-Este repositório concentra a base técnica da V2 do projeto de analytics logístico. A aplicação foi organizada para permitir evolução incremental, começando por:
+Este repositorio concentra a base tecnica da V2 do projeto de analytics logistico. A aplicacao evoluiu em fases incrementais, cobrindo:
 
-- ingestão local de dataset CSV para PostgreSQL
-- autenticação JWT básica para acesso aos recursos protegidos
-- exposição de KPIs e filtros principais via FastAPI
-- trilha mínima de documentação e validação para sustentar as próximas fases
+- ingestao local de dataset CSV para PostgreSQL
+- autenticacao JWT para acesso aos recursos protegidos
+- exposicao de KPIs e filtros principais via FastAPI
+- dashboard React consumindo a API real
+- baseline minima de testes e checklist operacional
+- base simples de deploy/demo same-origin
 
-O objetivo da base atual é servir como fundação confiável para novas etapas, sem antecipar complexidade de frontend, ML, RBAC completo ou pipelines de produção.
+O objetivo da base atual e servir como fundacao confiavel para demos, novas features de produto e evolucao de operacao, sem antecipar complexidade desnecessaria.
 
 ## Stack
 
@@ -21,49 +23,61 @@ O objetivo da base atual é servir como fundação confiável para novas etapas,
 - SQLAlchemy 2
 - Alembic
 - Pandas
-- JWT com `PyJWT`
-- Hash de senha com `passlib`
+- React
+- Vite
+- TypeScript
+- Tailwind CSS
+- Nginx para demo/deploy same-origin
 - Docker Compose
-- Pytest para baseline mínima de testes
+- Pytest
 
-## Estrutura de diretórios
+## Estrutura de diretorios
 
 ```text
 .
 ├── backend/
 │   ├── alembic/
 │   ├── app/
-│   │   ├── api/
-│   │   ├── auth/
-│   │   ├── core/
-│   │   ├── db/
-│   │   ├── models/
-│   │   ├── schemas/
-│   │   ├── scripts/
-│   │   └── services/
+│   ├── docker/
 │   ├── tests/
 │   ├── .env.example
+│   ├── Dockerfile.demo
 │   ├── alembic.ini
 │   ├── docker-compose.yml
 │   ├── README.md
 │   ├── requirements-dev.txt
 │   └── requirements.txt
+├── deploy/
+│   └── demo.env.example
 ├── docs/
-│   └── branch-validation-checklist.md
+│   ├── branch-validation-checklist.md
+│   └── deploy-demo.md
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── nginx.demo.conf
+│   └── package.json
+├── docker-compose.demo.yml
 ├── gerar_dataset_logistica_pe.py
 └── README.md
 ```
 
 ## Setup local
 
-O fluxo principal roda a partir de `backend/`.
-
-### 1. Ambiente
+### Backend
 
 ```bash
 cd backend
 python -m venv .venv
 source .venv/bin/activate
+pip install -r requirements.txt
+docker compose up -d
+alembic upgrade head
+uvicorn app.main:app --reload
 ```
 
 No PowerShell:
@@ -72,37 +86,23 @@ No PowerShell:
 cd backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-```
-
-### 2. Dependências
-
-```bash
 pip install -r requirements.txt
-```
-
-Para a baseline de testes:
-
-```bash
-pip install -r requirements-dev.txt
-```
-
-### 3. Configuração local
-
-Crie `backend/.env` a partir de `backend/.env.example` e defina pelo menos:
-
-- `JWT_SECRET_KEY` com valor real
-- credenciais do PostgreSQL local, se necessário
-
-`.env` local não deve ser commitado.
-
-### 4. Banco
-
-```bash
 docker compose up -d
 alembic upgrade head
+uvicorn app.main:app --reload
 ```
 
-## Geração e import de dataset
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+O frontend usa `VITE_API_BASE_URL=/api/v1`, mantendo compatibilidade com a arquitetura same-origin de demo/deploy.
+
+## Geracao e import de dataset
 
 O projeto inclui um gerador local de dataset:
 
@@ -114,40 +114,16 @@ Fluxo sugerido:
 2. manter o arquivo fora do versionamento
 3. importar para `shipments`
 
-Exemplo de import:
+Exemplo:
 
 ```bash
 cd backend
 python -m app.scripts.import_shipments caminho/para/arquivo.csv
 ```
 
-## Autenticação
+## API e autenticacao
 
-Criação do admin inicial:
-
-```bash
-cd backend
-python -m app.scripts.seed_admin --email admin@example.com --full-name "Admin"
-```
-
-Login:
-
-```bash
-curl -X POST http://127.0.0.1:8000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d "{\"email\":\"admin@example.com\",\"password\":\"Admin123!\"}"
-```
-
-Endpoint protegido:
-
-```bash
-curl http://127.0.0.1:8000/api/v1/auth/me \
-  -H "Authorization: Bearer SEU_TOKEN"
-```
-
-## Endpoints principais
-
-### Base
+### Endpoints base
 
 - `GET /api/v1/health`
 - `POST /api/v1/auth/login`
@@ -168,70 +144,61 @@ curl http://127.0.0.1:8000/api/v1/auth/me \
 - `GET /api/v1/filtros/transportadoras`
 - `GET /api/v1/filtros/tipos-veiculo`
 
-Os endpoints de KPI e filtros aceitam filtros opcionais por query params, como:
+Criacao do admin inicial:
 
-- `data_inicio`
-- `data_fim`
-- `origem`
-- `destino`
-- `transportadora`
-- `tipo_veiculo`
-- `ocorrencia`
+```bash
+cd backend
+python -m app.scripts.seed_admin --email admin@example.com --full-name "Admin"
+```
 
-## Analytics vs engenharia e segurança
+## Demo/Deploy
 
-### Analytics
+Para ambiente demonstravel, a base desta fase segue arquitetura same-origin:
 
-- modelagem inicial do dataset logístico em `shipments`
-- agregações de frete, ad valorem, taxa de ocorrência e score heurístico de risco
-- endpoints para exploração analítica com filtros
+- frontend buildado e servido como estatico
+- Nginx recebendo o trafego do navegador
+- `/api/v1` proxied para o backend FastAPI
+- PostgreSQL rodando na mesma composicao
 
-### Engenharia
+Guia curto:
 
-- estrutura modular pronta para evolução
-- sessão de banco com SQLAlchemy 2
-- migrations com Alembic
-- scripts explícitos de import e seed
-- baseline mínima de testes e checklist operacional
+- [docs/deploy-demo.md](./docs/deploy-demo.md)
 
-### Segurança
-
-- autenticação JWT
-- hash seguro de senha
-- validação de `JWT_SECRET_KEY` insegura no startup
-- auditoria de login e de acesso aos KPIs
-- arquivos locais sensíveis fora do versionamento
-
-## Validação e testes
+## Validacao e testes
 
 Checklist operacional por branch:
 
 - [docs/branch-validation-checklist.md](./docs/branch-validation-checklist.md)
 
-Smoke test inicial:
+Smoke tests atuais:
 
 ```bash
 cd backend
 pytest
 ```
 
+```bash
+cd frontend
+npm run lint
+npm run build
+```
+
 ## Roadmap
 
 ### Curto prazo
 
-- expandir cobertura de testes automatizados
-- consolidar documentação da raiz e do backend
-- revisar padronização de erros e logs
+- ampliar a documentacao operacional
+- endurecer a camada de deploy/demo
+- evoluir a cobertura de testes automatizados
 
-### Médio prazo
+### Medio prazo
 
-- novos endpoints analíticos e comparativos
-- testes de integração para auth, KPI e filtros
-- melhorias na camada de services e contratos de resposta
+- expandir observabilidade e operacao de runtime
+- novos endpoints analiticos e comparativos
+- testes de integracao mais completos
 
 ### Futuro
 
-- frontend
 - RBAC mais completo
-- pipelines de dados e observabilidade
-- componentes de modelagem analítica e ML quando fizer sentido
+- pipelines de dados e operacao
+- componentes de modelagem analitica e ML quando fizer sentido
