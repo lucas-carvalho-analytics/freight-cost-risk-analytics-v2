@@ -190,6 +190,19 @@ Guia curto:
 
 - [docs/secrets-and-operational-config.md](./docs/secrets-and-operational-config.md)
 
+## Observability foundation
+
+Existe agora uma base inicial de observabilidade para troubleshooting e operacao:
+
+- logs estruturados com contexto mais consistente
+- `request_id` por request
+- separacao entre `health` e `ready`
+- healthchecks do stack mais alinhados ao estado real dos servicos
+
+Guia curto:
+
+- [docs/observability-foundation.md](./docs/observability-foundation.md)
+
 ## Validacao e testes
 
 Checklist operacional por branch:
