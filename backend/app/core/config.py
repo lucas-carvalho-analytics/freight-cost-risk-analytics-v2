@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    app_env: str = "development"
     app_name: str = "freight_cost_risk_analytics"
     app_version: str = "0.1.0"
     api_v1_prefix: str = "/api/v1"
@@ -9,6 +10,8 @@ class Settings(BaseSettings):
     jwt_secret_key: str = "change-this-jwt-secret"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
+    log_level: str = "INFO"
+    web_concurrency: int = 2
 
     postgres_user: str = "postgres"
     postgres_password: str = "postgres"
@@ -38,6 +41,16 @@ class Settings(BaseSettings):
                 "JWT_SECRET_KEY is using the insecure default value. "
                 "Set a real secret before starting the API."
             )
+
+        if self.app_env.lower() == "production":
+            if len(self.jwt_secret_key) < 32:
+                raise RuntimeError(
+                    "JWT_SECRET_KEY must have at least 32 characters in production."
+                )
+            if self.web_concurrency < 1:
+                raise RuntimeError(
+                    "WEB_CONCURRENCY must be greater than or equal to 1."
+                )
 
 
 settings = Settings()

@@ -164,6 +164,20 @@ Guia curto:
 
 - [docs/deploy-demo.md](./docs/deploy-demo.md)
 
+## Production readiness foundation
+
+Existe agora uma base separada para preparacao de producao, ainda sem prometer deploy final:
+
+- runtime do backend separado de migrations
+- compose proprio para `production foundation`
+- env example especifico para producao
+- healthchecks operacionais minimos
+- validacoes extras para `APP_ENV=production`
+
+Guia curto:
+
+- [docs/production-readiness.md](./docs/production-readiness.md)
+
 ## Validacao e testes
 
 Checklist operacional por branch:
