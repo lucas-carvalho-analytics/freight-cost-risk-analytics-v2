@@ -203,6 +203,19 @@ Guia curto:
 
 - [docs/observability-foundation.md](./docs/observability-foundation.md)
 
+## CI/CD foundation
+
+Existe agora uma base inicial de automacao para validacao do projeto:
+
+- backend validado automaticamente
+- frontend validado automaticamente
+- compose/config validados automaticamente
+- foco em PRs e em pushes para `main`
+
+Guia curto:
+
+- [docs/ci-cd-foundation.md](./docs/ci-cd-foundation.md)
+
 ## Validacao e testes
 
 Checklist operacional por branch:
