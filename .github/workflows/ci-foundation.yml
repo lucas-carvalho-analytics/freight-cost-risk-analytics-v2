@@ -1,0 +1,76 @@
+name: CI Foundation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  backend-validation:
+    name: Backend Validation
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install backend dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Compile backend sources
+        run: python -m compileall app tests
+
+      - name: Run backend tests
+        run: pytest -q
+
+  frontend-validation:
+    name: Frontend Validation
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Build frontend
+        run: npm run build
+
+  compose-config-validation:
+    name: Compose Config Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Validate demo compose
+        run: docker compose --env-file deploy/demo.env.example -f docker-compose.demo.yml config > /dev/null
+
+      - name: Validate production foundation compose
+        run: docker compose --env-file deploy/production.env.example -f docker-compose.production-foundation.yml config > /dev/null
