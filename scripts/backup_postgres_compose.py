@@ -1,15 +1,24 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime
 from pathlib import Path
 
-from postgres_compose_ops import ROOT, build_compose_env, resolve_stack, run_compose
+from postgres_compose_ops import (
+    ROOT,
+    build_compose_env,
+    dump_sha256,
+    resolve_stack,
+    run_compose,
+    utc_timestamp_for_filename,
+    utc_timestamp_iso,
+    validate_dump_with_pg_restore,
+    write_backup_metadata,
+)
 
 
 def default_output_path(stack_name: str, database_name: str) -> Path:
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    return ROOT / "backups" / stack_name / f"{database_name}-{timestamp}.dump"
+    timestamp = utc_timestamp_for_filename()
+    return ROOT / "backups" / stack_name / f"{stack_name}-{database_name}-{timestamp}.dump"
 
 
 def parse_args() -> argparse.Namespace:
@@ -68,8 +77,33 @@ def main() -> int:
             f"Backup failed.\nSTDOUT:\n{result.stdout.decode('utf-8', errors='replace')}\nSTDERR:\n{result.stderr.decode('utf-8', errors='replace')}"
         )
 
-    output_path.write_bytes(result.stdout)
+    dump_bytes = result.stdout
+    validate_dump_with_pg_restore(
+        stack,
+        env=env,
+        env_file=env_file,
+        dump_bytes=dump_bytes,
+    )
+
+    output_path.write_bytes(dump_bytes)
+    sha256 = dump_sha256(dump_bytes)
+    metadata_path = write_backup_metadata(
+        output_path,
+        {
+            "backup_version": 1,
+            "stack": stack.name,
+            "database": env["POSTGRES_DB"],
+            "postgres_user": env["POSTGRES_USER"],
+            "created_at_utc": utc_timestamp_iso(),
+            "dump_format": "pg_dump_custom",
+            "sha256": sha256,
+            "size_bytes": len(dump_bytes),
+            "file_name": output_path.name,
+        },
+    )
     print(f"Backup created at {output_path}")
+    print(f"Backup metadata created at {metadata_path}")
+    print(f"Backup sha256: {sha256}")
     return 0
 
 

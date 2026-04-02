@@ -6,9 +6,12 @@ from pathlib import Path
 from postgres_compose_ops import (
     build_compose_env,
     compose_services,
+    dump_sha256,
+    read_backup_metadata,
     resolve_stack,
     run_compose,
     running_services,
+    validate_dump_with_pg_restore,
 )
 
 
@@ -64,6 +67,23 @@ def main() -> int:
     env_file = args.env_file.resolve() if args.env_file else None
     env = build_compose_env(stack, env_file)
     dump_bytes = input_path.read_bytes()
+    metadata = read_backup_metadata(input_path)
+
+    if metadata is not None:
+        expected_sha = str(metadata.get("sha256", ""))
+        actual_sha = dump_sha256(dump_bytes)
+        if not expected_sha or expected_sha != actual_sha:
+            raise SystemExit(
+                f"Metadata integrity check failed for {input_path}. "
+                f"expected sha256={expected_sha!r}, actual sha256={actual_sha!r}"
+            )
+
+    validate_dump_with_pg_restore(
+        stack,
+        env=env,
+        env_file=env_file,
+        dump_bytes=dump_bytes,
+    )
 
     available_services = compose_services(stack, env=env, env_file=env_file)
     currently_running = running_services(stack, env=env, env_file=env_file)

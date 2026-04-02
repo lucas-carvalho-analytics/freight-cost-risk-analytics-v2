@@ -250,6 +250,7 @@ Existe agora uma base minima de backup e restore do Postgres para operacao local
 - backup via `docker compose`
 - restore via `docker compose`
 - dumps fora do versionamento em `backups/`
+- naming previsivel e metadata sidecar
 - confirmacao explicita para restore destrutivo
 
 Guia curto:
