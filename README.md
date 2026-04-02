@@ -257,6 +257,20 @@ Guia curto:
 
 - [docs/backup-restore-foundation.md](./docs/backup-restore-foundation.md)
 
+## Backup/restore smoke tests
+
+Existe agora tambem uma validacao automatizavel do fluxo de backup/restore:
+
+- sobe stack controlado
+- cria dado sentinela
+- executa backup e valida metadata
+- executa restore e confirma retorno do dado
+- derruba o ambiente ao final
+
+Guia curto:
+
+- [docs/backup-restore-smoke-tests.md](./docs/backup-restore-smoke-tests.md)
+
 ## Validacao e testes
 
 Checklist operacional por branch:
