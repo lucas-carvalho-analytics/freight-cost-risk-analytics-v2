@@ -1,6 +1,6 @@
 # Container Smoke Tests Foundation
 
-Esta fase nao fecha e2e completo. Ela adiciona uma validacao pequena, automatizavel e mais realista do stack de demo usando containers.
+Esta fase nao fecha e2e completo. Ela adiciona uma validacao pequena, automatizavel e mais realista do stack de demo usando containers e fluxo HTTP autenticado.
 
 ## O que a fundacao cobre
 
@@ -9,12 +9,15 @@ Esta fase nao fecha e2e completo. Ela adiciona uma validacao pequena, automatiza
 - valida que o frontend responde em `/`
 - valida `GET /api/v1/health`
 - valida `GET /api/v1/ready`
+- seeda um admin de smoke test de forma controlada
+- valida `POST /api/v1/auth/login` com credencial valida
+- valida `POST /api/v1/auth/login` com credencial invalida
+- valida `GET /api/v1/auth/me` com JWT valido
+- valida `GET /api/v1/auth/me` sem token
 - derruba o ambiente ao final
 
 ## O que ela ainda nao cobre
 
-- login automatizado
-- seed de admin
 - import de dataset
 - fluxos protegidos por JWT
 - e2e de navegador
@@ -41,4 +44,4 @@ Se esse smoke test falhar:
 1. rode o script localmente
 2. observe `docker compose ps`
 3. observe os logs dos servicos
-4. corrija primeiro problemas de startup, healthcheck ou proxy
+4. corrija primeiro problemas de startup, healthcheck, proxy ou auth basica
