@@ -223,6 +223,7 @@ Existe agora tambem uma validacao basica de stack com containers para o ambiente
 - sobe o stack de demo de forma automatizavel
 - valida frontend servido
 - valida `health` e `ready` via compose
+- valida login real e endpoint protegido minimo
 - derruba o ambiente ao final
 
 Guia curto:

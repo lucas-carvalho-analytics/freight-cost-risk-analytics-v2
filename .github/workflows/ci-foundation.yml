@@ -78,7 +78,7 @@ jobs:
         run: docker compose --env-file deploy/production.env.example -f docker-compose.production-foundation.yml config > /dev/null
 
   demo-stack-smoke:
-    name: Demo Stack Smoke Test
+    name: Demo Stack Authenticated Smoke Test
     runs-on: ubuntu-latest
 
     steps:
