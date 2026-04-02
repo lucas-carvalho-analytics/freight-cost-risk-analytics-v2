@@ -271,6 +271,18 @@ Guia curto:
 
 - [docs/backup-restore-smoke-tests.md](./docs/backup-restore-smoke-tests.md)
 
+## Backup scheduling foundation
+
+Existe agora uma base minima para execucao recorrente de backups:
+
+- wrapper operacional para backup recorrente
+- parametros simples para stack, env, output e retencao local
+- exemplos curtos de cron e Task Scheduler
+
+Guia curto:
+
+- [docs/backup-scheduling-foundation.md](./docs/backup-scheduling-foundation.md)
+
 ## Validacao e testes
 
 Checklist operacional por branch:
