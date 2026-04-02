@@ -230,6 +230,19 @@ Guia curto:
 
 - [docs/container-smoke-tests-foundation.md](./docs/container-smoke-tests-foundation.md)
 
+## Production foundation smoke tests
+
+Existe agora tambem uma validacao minima e automatizavel do stack de `production foundation`:
+
+- sobe o stack de producao base com `docker compose`
+- valida `/healthz`, `health` e `ready`
+- verifica `migrate` concluido e servicos saudaveis
+- derruba o ambiente ao final
+
+Guia curto:
+
+- [docs/production-foundation-smoke-tests.md](./docs/production-foundation-smoke-tests.md)
+
 ## Validacao e testes
 
 Checklist operacional por branch:
