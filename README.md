@@ -243,6 +243,19 @@ Guia curto:
 
 - [docs/production-foundation-smoke-tests.md](./docs/production-foundation-smoke-tests.md)
 
+## Backup/restore foundation
+
+Existe agora uma base minima de backup e restore do Postgres para operacao local e foundation environments:
+
+- backup via `docker compose`
+- restore via `docker compose`
+- dumps fora do versionamento em `backups/`
+- confirmacao explicita para restore destrutivo
+
+Guia curto:
+
+- [docs/backup-restore-foundation.md](./docs/backup-restore-foundation.md)
+
 ## Validacao e testes
 
 Checklist operacional por branch:
