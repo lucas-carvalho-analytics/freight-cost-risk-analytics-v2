@@ -17,6 +17,11 @@ TIMEOUT_SECONDS = int(os.environ.get("SMOKE_TEST_TIMEOUT_SECONDS", "240"))
 ADMIN_EMAIL = "smoke-admin@example.com"
 ADMIN_PASSWORD = "SmokeTest123!"
 ADMIN_FULL_NAME = "Smoke Test Admin"
+SMOKE_ORIGEM = "Smoke Origin"
+SMOKE_DESTINO_A = "Smoke Destination A"
+SMOKE_DESTINO_B = "Smoke Destination B"
+SMOKE_TRANSPORTADORA = "Smoke Carrier"
+SMOKE_TIPO_VEICULO = "Truck"
 
 
 def run_compose(*args: str, env: dict[str, str]) -> subprocess.CompletedProcess[str]:
@@ -146,6 +151,59 @@ print("admin seeded")
         raise RuntimeError(f"failed to seed admin:\n{result.stdout}\n{result.stderr}")
 
 
+def seed_shipments(env: dict[str, str]) -> None:
+    seed_code = """
+from datetime import date
+from decimal import Decimal
+
+from app.db.session import SessionLocal
+from app.models.shipment import Shipment
+
+with SessionLocal() as session:
+    session.query(Shipment).filter(
+        Shipment.transportadora == "Smoke Carrier"
+    ).delete(synchronize_session=False)
+
+    shipments = [
+        Shipment(
+            data_embarque=date(2024, 1, 10),
+            origem="Smoke Origin",
+            destino="Smoke Destination A",
+            valor_carga=Decimal("10000.00"),
+            tipo_veiculo="Truck",
+            transportadora="Smoke Carrier",
+            taxa_ad_valorem_pct=Decimal("1.00"),
+            frete_peso=Decimal("150.00"),
+            ocorrencia="OK",
+            tem_ocorrencia=False,
+            ad_valorem=Decimal("100.00"),
+        ),
+        Shipment(
+            data_embarque=date(2024, 1, 11),
+            origem="Smoke Origin",
+            destino="Smoke Destination B",
+            valor_carga=Decimal("12000.00"),
+            tipo_veiculo="Truck",
+            transportadora="Smoke Carrier",
+            taxa_ad_valorem_pct=Decimal("1.00"),
+            frete_peso=Decimal("200.00"),
+            ocorrencia="Atraso",
+            tem_ocorrencia=True,
+            ad_valorem=Decimal("120.00"),
+        ),
+    ]
+    session.add_all(shipments)
+    session.commit()
+print("shipments seeded")
+""".strip()
+
+    result = compose_exec(env, "python", "-c", seed_code)
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"failed to seed smoke shipments:\n{result.stdout}\n{result.stderr}"
+        )
+
+
 def run_authenticated_checks(base_url: str) -> None:
     login_payload = {
         "email": ADMIN_EMAIL,
@@ -188,6 +246,31 @@ def run_authenticated_checks(base_url: str) -> None:
     if me_payload.get("email") != ADMIN_EMAIL:
         raise RuntimeError(f"unexpected /me payload: {me_payload}")
 
+    unauthorized_kpi = request_json(
+        f"{base_url}/api/v1/kpis/frete-total",
+        expected_status=401,
+    )
+    if unauthorized_kpi.get("message") != "Not authenticated.":
+        raise RuntimeError(f"unexpected unauthorized KPI payload: {unauthorized_kpi}")
+
+    frete_total_payload = request_json(
+        f"{base_url}/api/v1/kpis/frete-total?origem=Smoke%20Origin",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    if frete_total_payload != {
+        "metric": "frete_total",
+        "value": 350.0,
+        "shipment_count": 2,
+    }:
+        raise RuntimeError(f"unexpected KPI payload: {frete_total_payload}")
+
+    filtros_payload = request_json(
+        f"{base_url}/api/v1/filtros/origens",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    if SMOKE_ORIGEM not in filtros_payload.get("items", []):
+        raise RuntimeError(f"unexpected filter payload: {filtros_payload}")
+
 
 def main() -> int:
     env = os.environ.copy()
@@ -219,9 +302,10 @@ def main() -> int:
         wait_for_json(f"{base_url}/api/v1/health", "ok")
         wait_for_json(f"{base_url}/api/v1/ready", "ready")
         seed_admin(env)
+        seed_shipments(env)
         run_authenticated_checks(base_url)
 
-        print("Demo stack authenticated smoke test passed.")
+        print("Demo stack protected KPI smoke test passed.")
         return 0
     except Exception as exc:
         print(f"Smoke test failed: {exc}", file=sys.stderr)
