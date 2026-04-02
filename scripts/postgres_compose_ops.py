@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import subprocess
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -135,4 +138,62 @@ def running_services(stack: StackConfig, *, env: dict[str, str], env_file: Path 
     if result.returncode != 0:
         raise RuntimeError(f"failed to inspect running services:\n{result.stdout}\n{result.stderr}")
     return {line.strip() for line in result.stdout.splitlines() if line.strip()}
+
+
+def utc_timestamp_for_filename() -> str:
+    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+
+def utc_timestamp_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def dump_sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def metadata_path_for_dump(dump_path: Path) -> Path:
+    return dump_path.with_suffix(f"{dump_path.suffix}.metadata.json")
+
+
+def write_backup_metadata(dump_path: Path, metadata: dict[str, object]) -> Path:
+    metadata_path = metadata_path_for_dump(dump_path)
+    metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")
+    return metadata_path
+
+
+def read_backup_metadata(dump_path: Path) -> dict[str, object] | None:
+    metadata_path = metadata_path_for_dump(dump_path)
+    if not metadata_path.is_file():
+        return None
+    return json.loads(metadata_path.read_text(encoding="utf-8"))
+
+
+def validate_dump_with_pg_restore(
+    stack: StackConfig,
+    *,
+    env: dict[str, str],
+    env_file: Path | None,
+    dump_bytes: bytes,
+) -> None:
+    result = run_compose(
+        stack,
+        env=env,
+        env_file=env_file,
+        args=[
+            "exec",
+            "-T",
+            "postgres",
+            "sh",
+            "-lc",
+            "tmp_dump=/tmp/backup-validation.dump; cat > \"$tmp_dump\" && pg_restore --list \"$tmp_dump\" >/dev/null && rm -f \"$tmp_dump\"",
+        ],
+        input_bytes=dump_bytes,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            "dump integrity validation failed.\n"
+            f"STDOUT:\n{result.stdout.decode('utf-8', errors='replace')}\n"
+            f"STDERR:\n{result.stderr.decode('utf-8', errors='replace')}"
+        )
 
