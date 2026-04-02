@@ -108,3 +108,19 @@ jobs:
 
       - name: Run production foundation smoke test
         run: python scripts/smoke_test_production_foundation.py
+
+  backup-restore-smoke:
+    name: Backup Restore Smoke Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Run backup/restore smoke test
+        run: python scripts/smoke_test_backup_restore.py
