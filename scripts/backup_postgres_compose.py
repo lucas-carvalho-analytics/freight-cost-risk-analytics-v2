@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import os
+import subprocess
 from pathlib import Path
 
 from postgres_compose_ops import (
@@ -123,6 +125,47 @@ def main() -> int:
     print(f"Backup created at {output_path}")
     print(f"Backup metadata created at {metadata_path}")
     print(f"Backup sha256: {sha256}")
+
+    if "BACKUP_ENCRYPTION_KEY" in os.environ:
+        print("\n--- Encrypting Backup ---")
+        try:
+            subprocess.run(
+                [
+                    "python3",
+                    str(ROOT / "scripts" / "crypto_backup.py"),
+                    "encrypt",
+                    "--file",
+                    str(output_path),
+                ],
+                check=True,
+            )
+            encrypted_path = output_path.with_suffix(f"{output_path.suffix}.enc")
+            print(f"Encrypted artifact generated successfully: {encrypted_path.name}")
+            
+            output_path.unlink(missing_ok=True)
+            print(f"Raw dump removed securely: {output_path.name}")
+            
+            output_path = encrypted_path
+        except subprocess.CalledProcessError:
+            print("[ERROR] Core Encryption Flow Failed! Aborting.")
+            raise SystemExit(1)
+
+    if os.environ.get("BACKUP_REMOTE_DESTINATION"):
+        print("\n--- Uploading Backup ---")
+        try:
+            subprocess.run(
+                [
+                    "python3",
+                    str(ROOT / "scripts" / "upload_backup_remote.py"),
+                    "--file",
+                    str(output_path),
+                ],
+                check=True,
+            )
+        except subprocess.CalledProcessError:
+            print("[ERROR] Remote Upload Flow Failed! Aborting.")
+            raise SystemExit(1)
+
     return 0
 
 

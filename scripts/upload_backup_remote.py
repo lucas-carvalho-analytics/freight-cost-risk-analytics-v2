@@ -47,7 +47,11 @@ def main() -> int:
         print(f"[ERROR] Dump file does not exist: {source_dump}")
         return 1
 
-    metadata_file = source_dump.with_suffix(f"{source_dump.suffix}.metadata.json")
+    original_name_base = source_dump.name
+    if original_name_base.endswith(".enc"):
+        original_name_base = original_name_base[:-4]
+
+    metadata_file = source_dump.parent / f"{original_name_base}.metadata.json"
 
     remote_dest = os.environ.get("BACKUP_REMOTE_DESTINATION")
     if not remote_dest:
