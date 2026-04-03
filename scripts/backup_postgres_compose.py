@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import os
+import subprocess
 from pathlib import Path
 
 from postgres_compose_ops import (
