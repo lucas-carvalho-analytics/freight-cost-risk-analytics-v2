@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import os
+import subprocess
 from pathlib import Path
 
 from postgres_compose_ops import (
@@ -12,6 +14,7 @@ from postgres_compose_ops import (
     run_compose,
     running_services,
     validate_dump_with_pg_restore,
+    ROOT,
 )
 
 
@@ -63,11 +66,40 @@ def main() -> int:
     if not input_path.is_file():
         raise SystemExit(f"Dump file not found: {input_path}")
 
+    decrypted_temp_path = None
+    if input_path.name.endswith(".enc"):
+        if "BACKUP_ENCRYPTION_KEY" not in os.environ:
+            raise SystemExit("[ERROR] Encrypted dump detected but BACKUP_ENCRYPTION_KEY is strictly missing.")
+        
+        print(f"\n--- Decrypting {input_path.name} ---")
+        decrypted_temp_path = input_path.with_suffix("")
+        try:
+            subprocess.run(
+                [
+                    "python3",
+                    str(ROOT / "scripts" / "crypto_backup.py"),
+                    "decrypt",
+                    "--file",
+                    str(input_path),
+                ],
+                check=True,
+            )
+            print(f"Decryption successful. Preparing memory payload...")
+            input_path = decrypted_temp_path
+        except subprocess.CalledProcessError:
+            raise SystemExit("[ERROR] Decryption failed! Aborting restore flow.")
+
     stack = resolve_stack(args.stack)
     env_file = args.env_file.resolve() if args.env_file else None
     env = build_compose_env(stack, env_file)
-    dump_bytes = input_path.read_bytes()
-    metadata = read_backup_metadata(input_path)
+    
+    try:
+        dump_bytes = input_path.read_bytes()
+        metadata = read_backup_metadata(input_path)
+    finally:
+        if decrypted_temp_path and decrypted_temp_path.exists():
+            decrypted_temp_path.unlink()
+            print("Securely removed temporary decrypted disk artifact.")
 
     if metadata is not None:
         expected_sha = str(metadata.get("sha256", ""))
