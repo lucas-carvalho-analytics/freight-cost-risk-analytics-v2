@@ -96,7 +96,22 @@ def run_backup(
         capture_output=True,
     )
     if result.returncode != 0:
-        raise SystemExit(f"Scheduled backup failed.\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}")
+        error_msg = (
+            "======================================================================\n"
+            "[SCHEDULED_BACKUP_ERROR] The underlying backup command failed\n"
+            f"Target Stack: {stack} | Output Dir: {output_path.parent}\n"
+            "======================================================================\n"
+            f"Command Executed: {' '.join(command)}\n"
+            "======================================================================\n"
+            f"STDOUT:\n{result.stdout}\n"
+            f"STDERR:\n{result.stderr}\n"
+            "======================================================================\n"
+            "ACTION RECOMMENDED: Check the underlying backup script output above.\n"
+            "Ensure enough disk space and that the stack is running.\n"
+            "Reference: docs/backup-failure-visibility-foundation.md\n"
+            "======================================================================"
+        )
+        raise SystemExit(error_msg)
 
     sys.stdout.write(result.stdout)
     sys.stderr.write(result.stderr)

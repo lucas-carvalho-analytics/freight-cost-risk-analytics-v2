@@ -191,9 +191,18 @@ def validate_dump_with_pg_restore(
         input_bytes=dump_bytes,
     )
     if result.returncode != 0:
-        raise RuntimeError(
-            "dump integrity validation failed.\n"
+        error_msg = (
+            "======================================================================\n"
+            "[BACKUP_ERROR] Stage: dump integrity validation\n"
+            f"Target Stack: {stack.name}\n"
+            "======================================================================\n"
             f"STDOUT:\n{result.stdout.decode('utf-8', errors='replace')}\n"
-            f"STDERR:\n{result.stderr.decode('utf-8', errors='replace')}"
+            f"STDERR:\n{result.stderr.decode('utf-8', errors='replace')}\n"
+            "======================================================================\n"
+            "ACTION RECOMMENDED: The dump file was generated but failed pg_restore validation.\n"
+            "It may be corrupted or incomplete. Do not rely on this dump.\n"
+            "Reference: docs/backup-failure-visibility-foundation.md\n"
+            "======================================================================"
         )
+        raise RuntimeError(error_msg)
 
