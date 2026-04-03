@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import urllib.request
 from pathlib import Path
 
 from postgres_compose_ops import ROOT
@@ -35,12 +37,35 @@ def process_alert(path: Path, dry_run: bool) -> None:
     timestamp = data.get("timestamp_utc", "UNKNOWN")
     message = data.get("message", "No message provided")
 
-    print("========================================")
-    print(f"ALERT: {event} | Stack: {stack} | DB: {db}")
-    print(f"Step: {step}")
-    print(f"Time: {timestamp}")
-    print(f"Message:\n{message}")
-    print("========================================\n")
+    report = (
+        "========================================\n"
+        f"ALERT: {event} | Stack: {stack} | DB: {db}\n"
+        f"Step: {step}\n"
+        f"Time: {timestamp}\n"
+        f"Message:\n{message}\n"
+        "========================================\n"
+    )
+    print(report)
+
+    webhook_url = os.environ.get("BACKUP_ALERT_WEBHOOK_URL")
+    if webhook_url:
+        payload_bytes = json.dumps({"text": f"```\n{report.strip()}\n```"}).encode("utf-8")
+        if not dry_run:
+            req = urllib.request.Request(
+                webhook_url,
+                data=payload_bytes,
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            try:
+                with urllib.request.urlopen(req) as response:
+                    print(f"Webhook sent successfully. Status: {response.status}")
+            except Exception as exc:
+                print(f"[ERROR] Failed to send alert webhook: {exc}")
+                print(f"Retaining {path.name} for future retry.")
+                return
+        else:
+            print(f"[dry-run] Would send alert webhook to {webhook_url}")
 
     if not dry_run:
         target_path = path.with_suffix(f"{path.suffix}.processed")
