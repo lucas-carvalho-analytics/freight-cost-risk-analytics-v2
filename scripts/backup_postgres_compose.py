@@ -73,9 +73,19 @@ def main() -> int:
     )
 
     if result.returncode != 0:
-        raise SystemExit(
-            f"Backup failed.\nSTDOUT:\n{result.stdout.decode('utf-8', errors='replace')}\nSTDERR:\n{result.stderr.decode('utf-8', errors='replace')}"
+        error_msg = (
+            "======================================================================\n"
+            "[BACKUP_ERROR] Stage: pg_dump execution\n"
+            f"Target Stack: {stack.name} | Database: {env['POSTGRES_DB']}\n"
+            "======================================================================\n"
+            f"STDOUT:\n{result.stdout.decode('utf-8', errors='replace')}\n"
+            f"STDERR:\n{result.stderr.decode('utf-8', errors='replace')}\n"
+            "======================================================================\n"
+            "ACTION RECOMMENDED: Check if database container is running and accepting connections.\n"
+            "Reference: docs/backup-failure-visibility-foundation.md\n"
+            "======================================================================"
         )
+        raise SystemExit(error_msg)
 
     dump_bytes = result.stdout
     validate_dump_with_pg_restore(
