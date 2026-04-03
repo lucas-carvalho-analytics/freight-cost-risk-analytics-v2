@@ -5,7 +5,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-from postgres_compose_ops import ROOT, build_compose_env, resolve_stack, utc_timestamp_for_filename
+from postgres_compose_ops import (
+    ROOT,
+    build_compose_env,
+    resolve_stack,
+    utc_timestamp_for_filename,
+    write_backup_failure_event,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -96,6 +102,13 @@ def run_backup(
         capture_output=True,
     )
     if result.returncode != 0:
+        event_path = write_backup_failure_event(
+            stack_name=stack,
+            database_name="unknown",
+            step="scheduled_backup_execution",
+            exit_code=result.returncode,
+            message="The underlying backup command failed. Check script output.",
+        )
         error_msg = (
             "======================================================================\n"
             "[SCHEDULED_BACKUP_ERROR] The underlying backup command failed\n"
@@ -108,6 +121,7 @@ def run_backup(
             "======================================================================\n"
             "ACTION RECOMMENDED: Check the underlying backup script output above.\n"
             "Ensure enough disk space and that the stack is running.\n"
+            f"Alert payload written to: {event_path}\n"
             "Reference: docs/backup-failure-visibility-foundation.md\n"
             "======================================================================"
         )

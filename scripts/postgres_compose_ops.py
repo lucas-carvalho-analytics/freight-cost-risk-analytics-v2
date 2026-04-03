@@ -169,6 +169,33 @@ def read_backup_metadata(dump_path: Path) -> dict[str, object] | None:
     return json.loads(metadata_path.read_text(encoding="utf-8"))
 
 
+def write_backup_failure_event(
+    stack_name: str,
+    database_name: str,
+    step: str,
+    exit_code: int,
+    message: str,
+) -> Path:
+    alerts_dir = ROOT / "backups" / "alerts"
+    alerts_dir.mkdir(parents=True, exist_ok=True)
+    
+    timestamp = utc_timestamp_for_filename()
+    database_part = f"-{database_name}" if database_name and database_name != "unknown" else ""
+    event_path = alerts_dir / f"{stack_name}{database_part}-{timestamp}-failure-event.json"
+    
+    payload = {
+        "event": "backup_failure",
+        "step": step,
+        "exit_code": exit_code,
+        "stack": stack_name,
+        "database": database_name,
+        "timestamp_utc": utc_timestamp_iso(),
+        "message": message,
+    }
+    event_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    return event_path
+
+
 def validate_dump_with_pg_restore(
     stack: StackConfig,
     *,
@@ -191,6 +218,13 @@ def validate_dump_with_pg_restore(
         input_bytes=dump_bytes,
     )
     if result.returncode != 0:
+        event_path = write_backup_failure_event(
+            stack_name=stack.name,
+            database_name=env.get("POSTGRES_DB", "unknown"),
+            step="dump_integrity_validation",
+            exit_code=result.returncode,
+            message="The dump file was generated but failed pg_restore validation.",
+        )
         error_msg = (
             "======================================================================\n"
             "[BACKUP_ERROR] Stage: dump integrity validation\n"
@@ -201,6 +235,7 @@ def validate_dump_with_pg_restore(
             "======================================================================\n"
             "ACTION RECOMMENDED: The dump file was generated but failed pg_restore validation.\n"
             "It may be corrupted or incomplete. Do not rely on this dump.\n"
+            f"Alert payload written to: {event_path}\n"
             "Reference: docs/backup-failure-visibility-foundation.md\n"
             "======================================================================"
         )
