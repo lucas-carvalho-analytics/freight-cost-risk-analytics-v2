@@ -12,6 +12,7 @@ from postgres_compose_ops import (
     utc_timestamp_for_filename,
     utc_timestamp_iso,
     validate_dump_with_pg_restore,
+    write_backup_failure_event,
     write_backup_metadata,
 )
 
@@ -73,6 +74,13 @@ def main() -> int:
     )
 
     if result.returncode != 0:
+        event_path = write_backup_failure_event(
+            stack_name=stack.name,
+            database_name=env["POSTGRES_DB"],
+            step="pg_dump_execution",
+            exit_code=result.returncode,
+            message=result.stderr.decode("utf-8", errors="replace").strip() or "pg_dump failed to execute.",
+        )
         error_msg = (
             "======================================================================\n"
             "[BACKUP_ERROR] Stage: pg_dump execution\n"
@@ -82,6 +90,7 @@ def main() -> int:
             f"STDERR:\n{result.stderr.decode('utf-8', errors='replace')}\n"
             "======================================================================\n"
             "ACTION RECOMMENDED: Check if database container is running and accepting connections.\n"
+            f"Alert payload written to: {event_path}\n"
             "Reference: docs/backup-failure-visibility-foundation.md\n"
             "======================================================================"
         )
