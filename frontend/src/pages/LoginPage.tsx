@@ -59,14 +59,14 @@ export function LoginPage() {
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-slate-700">E-mail</span>
+            <span className="mb-2 block text-sm font-medium text-slate-700">Login</span>
             <input
-              autoComplete="email"
+              autoComplete="username"
               className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100"
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="admin@example.com"
+              placeholder="Seu usuário ou e-mail"
               required
-              type="email"
+              type="text"
               value={email}
             />
           </label>

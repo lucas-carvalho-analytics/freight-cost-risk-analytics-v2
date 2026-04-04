@@ -12,7 +12,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Cria ou atualiza o usuario admin inicial.",
     )
-    parser.add_argument("--email", required=True, help="Email do admin.")
+    parser.add_argument("--email", required=True, help="Email ou Login do admin.")
     parser.add_argument(
         "--full-name",
         default="Admin",

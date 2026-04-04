@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios'
 import { api } from './api'
 import { clearAccessToken, setAccessToken } from './storage'
-import type { ApiErrorResponse, AuthUser, LoginPayload, LoginResponse } from '../types/auth'
+import type { ApiErrorResponse, AuthUser, LoginPayload, LoginResponse, ChangePasswordPayload } from '../types/auth'
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {
   const response = await api.post<LoginResponse>('/auth/login', payload, {
@@ -14,6 +14,10 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
 export async function fetchCurrentUser(): Promise<AuthUser> {
   const response = await api.get<AuthUser>('/auth/me')
   return response.data
+}
+
+export async function changePassword(payload: ChangePasswordPayload): Promise<void> {
+  await api.put('/auth/change-password', payload)
 }
 
 export function logout(): void {

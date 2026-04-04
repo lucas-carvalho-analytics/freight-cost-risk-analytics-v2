@@ -66,8 +66,8 @@ O sistema abre sozinho no navegador. Você vai ver algo assim na tela do instala
      http://freight-analytics.local:8080
 
   🔐 Login:
-     E-mail:  operador@freight-analytics.com
-     Senha:   Freight@2024
+     E-mail:  (o que você definiu)
+     Senha:   ******** (a que você definiu)
 ```
 
 ---
@@ -80,8 +80,8 @@ Depois da instalação, o navegador abre automaticamente. Se precisar acessar ma
 2. Acesse: `http://freight-analytics.local:8080`
    - Se esse endereço não funcionar, use: `http://127.0.0.1:8080`
 3. Na tela de login:
-   - **E-mail:** `operador@freight-analytics.com`
-   - **Senha:** `Freight@2024`
+   - **Login:** (o e-mail ou usuário inserido na instalação)
+   - **Senha:** (a senha que você definiu)
 4. Clique em **Entrar**
 
 ---
@@ -119,9 +119,11 @@ A seção **Filtros operacionais** permite refinar os dados:
 
 Os dados atualizam automaticamente ao mudar qualquer filtro. Para voltar ao estado original, clique em **Limpar filtros**.
 
-### Sessão
+### Sessão e Segurança
 
 A sessão dura 60 minutos. Quando expirar, o sistema volta para a tela de login. É só entrar de novo.
+
+Você pode **alterar sua senha** a qualquer momento clicando no botão "Alterar senha" no topo do dashboard, ao lado de onde mostra o seu nome.
 
 ---
 
@@ -179,10 +181,10 @@ Depois, rode o instalador novamente.
 
 ### "O login não funciona"
 
-- Confirme: e-mail `operador@freight-analytics.com`, senha `Freight@2024`.
-- Se rodou a instalação manual, o usuário pode não ter sido criado. Execute:
+- Confirme se você está usando o e-mail e a senha que escolheu no assistente de instalação.
+- Se rodou a instalação manual, o usuário pode não ter sido criado. Execute (trocando as credenciais):
   ```bash
-  docker compose --env-file deploy/demo.env -f docker-compose.demo.yml exec backend python -m app.scripts.seed_admin --email operador@freight-analytics.com --full-name "Operador Freight" --password Freight@2024
+  docker compose --env-file deploy/demo.env -f docker-compose.demo.yml exec backend python -m app.scripts.seed_admin --email o-seu-email@aqui.com --full-name "Operador Freight" --password A-Sua-Senha-Aqui
   ```
 
 ### "Dashboard sem dados"

@@ -15,6 +15,7 @@ import subprocess
 import sys
 import time
 import webbrowser
+import getpass
 from pathlib import Path
 
 # ── Configuração ─────────────────────────────────────────────
@@ -26,8 +27,8 @@ ENV_FILE = PROJECT_ROOT / "deploy" / "demo.env"
 DATASET_GENERATOR = PROJECT_ROOT / "gerar_dataset_logistica_pe.py"
 BACKEND_DATA_DIR = PROJECT_ROOT / "backend" / "data"
 
-DEMO_EMAIL = "operador@freight-analytics.com"
-DEMO_PASSWORD = "Freight@2024"
+DEMO_EMAIL = ""
+DEMO_PASSWORD = ""
 LOCAL_HOSTNAME = "freight-analytics.local"
 HEALTH_TIMEOUT = 150  # segundos
 HEALTH_INTERVAL = 4   # segundos entre tentativas
@@ -77,6 +78,28 @@ def compose_cmd() -> list[str]:
 
 def compose_run(*args: str, **kwargs) -> subprocess.CompletedProcess:
     return run([*compose_cmd(), *args], **kwargs)
+
+
+# ── 0. Configurar credenciais ────────────────────────────────
+
+def configure_credentials() -> None:
+    global DEMO_EMAIL, DEMO_PASSWORD
+    print()
+    step(0, "Configuração de Login (Segurança)")
+    
+    default_email = "comexhebron26@freight-analytics.com"
+    email_input = input(f"  {_c('1;37', 'E-mail')} [{default_email}]: ").strip()
+    DEMO_EMAIL = email_input if email_input else default_email
+
+    while True:
+        pw_input = getpass.getpass(f"  {_c('1;37', 'Senha')}: ").strip()
+        if len(pw_input) >= 6:
+            DEMO_PASSWORD = pw_input
+            break
+        else:
+            warn("A senha deve ter pelo menos 6 caracteres.")
+    
+    ok(f"Credenciais configuradas para {DEMO_EMAIL}.")
 
 
 # ── 1. Detecção do sistema operacional ───────────────────────
@@ -394,7 +417,7 @@ def print_summary(url: str) -> None:
     print()
     print(f"  {_c('1;37', '🔐 Login:')}")
     print(f"     E-mail:  {_c('1;33', DEMO_EMAIL)}")
-    print(f"     Senha:   {_c('1;33', DEMO_PASSWORD)}")
+    print(f"     Senha:   {_c('1;33', '******** (a que você definiu)')}")
     print()
     print(f"  {_c('1;37', '⚡ Comandos úteis:')}")
     print(f"     Parar:   docker compose --env-file {env_rel} -f {comp_rel} down")
@@ -410,6 +433,7 @@ def print_summary(url: str) -> None:
 def main() -> None:
     banner("Freight Cost Risk Analytics — Instalação Automática")
 
+    configure_credentials()
     show_os_info()
     check_prerequisites()
     port = setup_env_file()

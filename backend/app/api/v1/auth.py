@@ -3,12 +3,18 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_active_user
-from app.auth.security import create_access_token, verify_password
+from app.auth.security import create_access_token, verify_password, hash_password
 from app.core.config import settings
 from app.db.session import get_db
 from app.models.audit_log import AuditLog
 from app.models.user import User
-from app.schemas.auth import LoginRequest, TokenResponse, UserMeResponse
+from app.schemas.auth import (
+    LoginRequest,
+    TokenResponse,
+    UserMeResponse,
+    ChangePasswordRequest,
+    ChangePasswordResponse,
+)
 
 
 router = APIRouter(prefix="/auth")
@@ -57,3 +63,29 @@ def read_current_user(
     current_user: User = Depends(get_current_active_user),
 ) -> UserMeResponse:
     return UserMeResponse.model_validate(current_user)
+
+
+@router.put("/change-password", response_model=ChangePasswordResponse)
+def change_password(
+    payload: ChangePasswordRequest,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> ChangePasswordResponse:
+    if not verify_password(payload.current_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid current password.",
+        )
+
+    current_user.password_hash = hash_password(payload.new_password)
+    
+    db.add(
+        AuditLog(
+            user_id=current_user.id,
+            action="password_changed",
+            endpoint="/api/v1/auth/change-password",
+        )
+    )
+    db.commit()
+
+    return ChangePasswordResponse(message="Password changed successfully.")

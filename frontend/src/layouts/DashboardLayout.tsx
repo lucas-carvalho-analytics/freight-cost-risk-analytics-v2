@@ -1,8 +1,11 @@
 import type { ReactNode } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
+import { ChangePasswordModal } from '../components/ChangePasswordModal'
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { logout, user } = useAuth()
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-transparent">
@@ -23,6 +26,13 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
             </div>
             <button
               className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+              onClick={() => setIsPasswordModalOpen(true)}
+              type="button"
+            >
+              Alterar senha
+            </button>
+            <button
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
               onClick={logout}
               type="button"
             >
@@ -32,6 +42,11 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-6 py-8 lg:px-10">{children}</main>
+      
+      <ChangePasswordModal 
+        isOpen={isPasswordModalOpen} 
+        onClose={() => setIsPasswordModalOpen(false)} 
+      />
     </div>
   )
 }
