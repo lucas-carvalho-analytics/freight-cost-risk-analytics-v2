@@ -18,6 +18,11 @@ def parse_args() -> argparse.Namespace:
         default="Admin",
         help="Nome completo do admin.",
     )
+    parser.add_argument(
+        "--password",
+        default=None,
+        help="Senha do admin (modo nao-interativo). Se omitido, solicita via terminal.",
+    )
     return parser.parse_args()
 
 
@@ -36,7 +41,7 @@ def prompt_password() -> str:
 def main() -> None:
     args = parse_args()
     email = args.email.strip().lower()
-    password = prompt_password()
+    password = args.password if args.password else prompt_password()
 
     with SessionLocal() as session:
         user = session.scalar(select(User).where(User.email == email))
