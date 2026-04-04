@@ -9,3 +9,5 @@ htmlcov/
 .idea/
 backend/data/*.csv
 backups/
+dataset_operacoes_logisticas_pe.csv
+deploy/demo.env

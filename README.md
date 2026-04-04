@@ -68,8 +68,8 @@ Quando terminar, o navegador abre sozinho:
   🌐 Acesse: http://freight-analytics.local:8080
 
   🔐 Login:
-     E-mail:  admin@demo.local
-     Senha:   demo1234
+     E-mail:  operador@freight-analytics.com
+     Senha:   Freight@2024
 ```
 
 > 📖 **Primeiro uso?** Leia o [Tutorial do Usuário](docs/tutorial-usuario-final.md) para aprender a usar o dashboard.

@@ -66,8 +66,8 @@ O sistema abre sozinho no navegador. Você vai ver algo assim na tela do instala
      http://freight-analytics.local:8080
 
   🔐 Login:
-     E-mail:  admin@demo.local
-     Senha:   demo1234
+     E-mail:  operador@freight-analytics.com
+     Senha:   Freight@2024
 ```
 
 ---
@@ -80,8 +80,8 @@ Depois da instalação, o navegador abre automaticamente. Se precisar acessar ma
 2. Acesse: `http://freight-analytics.local:8080`
    - Se esse endereço não funcionar, use: `http://127.0.0.1:8080`
 3. Na tela de login:
-   - **E-mail:** `admin@demo.local`
-   - **Senha:** `demo1234`
+   - **E-mail:** `operador@freight-analytics.com`
+   - **Senha:** `Freight@2024`
 4. Clique em **Entrar**
 
 ---
@@ -179,10 +179,10 @@ Depois, rode o instalador novamente.
 
 ### "O login não funciona"
 
-- Confirme: e-mail `admin@demo.local`, senha `demo1234`.
+- Confirme: e-mail `operador@freight-analytics.com`, senha `Freight@2024`.
 - Se rodou a instalação manual, o usuário pode não ter sido criado. Execute:
   ```bash
-  docker compose --env-file deploy/demo.env -f docker-compose.demo.yml exec backend python -m app.scripts.seed_admin --email admin@demo.local --full-name "Admin Demo" --password demo1234
+  docker compose --env-file deploy/demo.env -f docker-compose.demo.yml exec backend python -m app.scripts.seed_admin --email operador@freight-analytics.com --full-name "Operador Freight" --password Freight@2024
   ```
 
 ### "Dashboard sem dados"

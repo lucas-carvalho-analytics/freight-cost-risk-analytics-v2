@@ -26,8 +26,8 @@ ENV_FILE = PROJECT_ROOT / "deploy" / "demo.env"
 DATASET_GENERATOR = PROJECT_ROOT / "gerar_dataset_logistica_pe.py"
 BACKEND_DATA_DIR = PROJECT_ROOT / "backend" / "data"
 
-DEMO_EMAIL = "admin@demo.local"
-DEMO_PASSWORD = "demo1234"
+DEMO_EMAIL = "operador@freight-analytics.com"
+DEMO_PASSWORD = "Freight@2024"
 LOCAL_HOSTNAME = "freight-analytics.local"
 HEALTH_TIMEOUT = 150  # segundos
 HEALTH_INTERVAL = 4   # segundos entre tentativas
@@ -246,7 +246,7 @@ def seed_admin() -> None:
         "exec", "-T", "backend",
         "python", "-m", "app.scripts.seed_admin",
         "--email", DEMO_EMAIL,
-        "--full-name", "Admin Demo",
+        "--full-name", "Operador Freight",
         "--password", DEMO_PASSWORD,
     )
 
