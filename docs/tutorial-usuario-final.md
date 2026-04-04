@@ -1,150 +1,96 @@
 # Tutorial do Usuário Final
 
-Este tutorial ensina como instalar, acessar e usar o sistema de analytics logístico no dia a dia. Ele foi feito para quem vai operar o sistema na empresa, mesmo sem experiência técnica anterior com este projeto.
+Bem-vindo! Este tutorial ensina como instalar e usar o sistema de analytics logístico. Você não precisa ter experiência técnica — o instalador cuida de tudo.
 
 ---
 
 ## 1. O que é este sistema
 
-O Freight Cost Risk Analytics é um painel web para acompanhar a operação logística da empresa. Com ele, você pode:
+O **Freight Cost Risk Analytics** é um painel online para acompanhar a operação logística da empresa. Com ele, você pode:
 
-- Ver indicadores de custo de frete, ad valorem e ocorrências em tempo real
+- Ver indicadores de frete, ad valorem e ocorrências
 - Filtrar por período, origem, destino, transportadora e tipo de veículo
-- Comparar o custo entre transportadoras em gráfico
+- Comparar custos entre transportadoras em gráfico
 - Analisar o risco por destino de entrega
-- Acessar tudo de forma protegida por login
+- Tudo protegido por login com e-mail e senha
 
-O sistema funciona na sua máquina usando Docker. Você acessa pelo navegador, como qualquer site.
-
----
-
-## 2. O que você precisa ter instalado
-
-Três programas são necessários:
-
-**Docker Desktop** — roda o sistema sem precisar instalar bancos de dados ou servidores manualmente.
-- Windows: [docker.com/desktop/windows](https://docs.docker.com/desktop/install/windows-install/)
-- Linux: [docker.com/engine/install](https://docs.docker.com/engine/install/)
-- macOS: [docker.com/desktop/mac](https://docs.docker.com/desktop/install/mac-install/)
-
-**Python 3** — executa o script de instalação automática.
-- [python.org/downloads](https://www.python.org/downloads/)
-- No Windows, marque a opção **"Add Python to PATH"** durante a instalação
-
-**Git** — baixa o projeto do repositório.
-- [git-scm.com/downloads](https://git-scm.com/downloads)
-
-### Como verificar
-
-Abra o terminal e execute estes comandos, um por vez:
-
-```bash
-docker --version
-git --version
-```
-
-No Linux ou macOS:
-```bash
-python3 --version
-```
-
-No Windows:
-```powershell
-python --version
-```
-
-Se cada comando mostrar um número de versão, está tudo certo. Se aparecer erro em algum, instale esse programa antes de continuar.
-
-> **Importante:** o Docker Desktop precisa estar **aberto e rodando** antes de prosseguir.
+O sistema roda na sua máquina e você acessa pelo navegador, como qualquer site.
 
 ---
 
-## 3. Como instalar o sistema
+## 2. Como instalar
 
-Abra o terminal e execute estes comandos, um por vez:
+O instalador verifica tudo que precisa, baixa o projeto, configura e inicia o sistema automaticamente.
 
-**Passo 1 — Baixar o projeto:**
+### No Windows
 
-```bash
-git clone https://github.com/lucas-carvalho-analytics/freight-cost-risk-analytics-v2.git
-```
+1. Baixe o arquivo `instalar.bat` do projeto
+2. Dê **duplo-clique** no arquivo
+3. Se o Windows perguntar se deseja executar, clique em **"Executar assim mesmo"**
+4. Siga as instruções na tela
 
-**Passo 2 — Entrar na pasta do projeto:**
+### No Linux ou macOS
 
-```bash
-cd freight-cost-risk-analytics-v2
-```
+1. Baixe o arquivo `instalar.sh` do projeto
+2. Abra o terminal na pasta onde baixou o arquivo
+3. Execute:
+   ```bash
+   bash instalar.sh
+   ```
 
-**Passo 3 — Executar a instalação automática:**
+### O que o instalador faz
 
-No Linux ou macOS:
-```bash
-python3 quick-start.py
-```
+O instalador trabalha em 8 etapas automáticas:
 
-No Windows:
-```powershell
-python quick-start.py
-```
+| Etapa | O que faz |
+|---|---|
+| 1 | Detecta seu sistema operacional |
+| 2 | Verifica se Docker, Python e Git estão instalados |
+| 3 | Cria a configuração do sistema automaticamente |
+| 4 | Inicia os serviços (banco de dados, backend e frontend) |
+| 5 | Aguarda tudo ficar pronto |
+| 6 | Cria o usuário de acesso |
+| 7 | Carrega 5.000 registros de demonstração |
+| 8 | Configura o endereço local e abre o navegador |
 
-### O que acontece durante a instalação
+Se algum programa estiver faltando (Docker, Python ou Git), o instalador avisa e abre a página de download para você. Depois de instalar o que faltou, é só rodar o instalador de novo.
 
-O script faz tudo sozinho:
+### Quando terminar
 
-1. Detecta seu sistema operacional (Linux, macOS ou Windows)
-2. Verifica se o Docker está funcionando
-3. Cria o arquivo de configuração com uma chave de segurança gerada automaticamente
-4. Inicia os serviços (banco de dados, backend e frontend)
-5. Aguarda todos ficarem saudáveis
-6. Cria o usuário de acesso
-7. Gera e importa dados de demonstração
-
-Na primeira vez, pode levar alguns minutos enquanto o Docker baixa o que precisa.
-
-### Quando a instalação terminar
-
-Você vai ver esta mensagem:
+O sistema abre sozinho no navegador. Você vai ver algo assim na tela do instalador:
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ✅  Sistema pronto!
+  ✅  SISTEMA PRONTO!
 
-  Abra no navegador:
-    http://127.0.0.1:8080
+  🌐 Acesse no navegador:
+     http://freight-analytics.local:8080
 
-  Login:
-    E-mail:  admin@demo.local
-    Senha:   demo1234
-
-  Comandos úteis:
-    Parar:    docker compose --env-file deploy/demo.env -f docker-compose.demo.yml down
-    Subir:    docker compose --env-file deploy/demo.env -f docker-compose.demo.yml up -d
-    Logs:     docker compose --env-file deploy/demo.env -f docker-compose.demo.yml logs -f
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🔐 Login:
+     E-mail:  admin@demo.local
+     Senha:   demo1234
 ```
-
-Pronto. O sistema está funcionando.
 
 ---
 
-## 4. Como acessar
+## 3. Como acessar
+
+Depois da instalação, o navegador abre automaticamente. Se precisar acessar manualmente:
 
 1. Abra o navegador (Chrome, Firefox ou Edge)
-2. Digite na barra de endereço: `http://127.0.0.1:8080`
-3. Na tela de login, preencha:
+2. Acesse: `http://freight-analytics.local:8080`
+   - Se esse endereço não funcionar, use: `http://127.0.0.1:8080`
+3. Na tela de login:
    - **E-mail:** `admin@demo.local`
    - **Senha:** `demo1234`
 4. Clique em **Entrar**
 
-O dashboard vai abrir com dados de demonstração já carregados.
-
 ---
 
-## 5. Como usar o dashboard
+## 4. Como usar o dashboard
 
 ### Indicadores
 
-No topo do dashboard, três cards mostram os números principais:
+No topo do dashboard, três cards mostram os números principais da operação:
 
 | Indicador | O que mostra |
 |---|---|
@@ -152,38 +98,34 @@ No topo do dashboard, três cards mostram os números principais:
 | **Ad valorem total** | Soma dos valores de ad valorem |
 | **Taxa de ocorrências** | Percentual de embarques com sinistro ou atraso |
 
-Cada card também mostra quantos embarques foram considerados no cálculo.
-
 ### Gráficos
 
-Abaixo dos indicadores, dois gráficos permitem análise visual:
+Abaixo dos indicadores:
 
-- **Custo por transportadora** — compara os custos entre as empresas de transporte
-- **Risco por destino** — mostra o nível de risco em cada localidade de entrega
+- **Custo por transportadora** — compara custos entre empresas de transporte
+- **Risco por destino** — mostra o nível de risco por localidade
 
 ### Filtros
 
-A seção **Filtros operacionais** fica no topo e permite refinar os dados exibidos:
+A seção **Filtros operacionais** permite refinar os dados:
 
-| Filtro | Exemplo de uso |
+| Filtro | Exemplo |
 |---|---|
-| Data inicial e final | Analisar apenas o mês de março |
+| Data inicial e final | Analisar só o mês de março |
 | Origem | Ver embarques que saíram de Suape |
 | Destino | Focar em entregas para Caruaru |
-| Transportadora | Comparar uma transportadora específica |
+| Transportadora | Analisar uma transportadora específica |
 | Tipo de veículo | Filtrar por Carreta, Truck, etc. |
 
-Os indicadores e gráficos atualizam automaticamente quando você muda qualquer filtro.
-
-Para voltar a ver todos os dados, clique em **Limpar filtros**.
+Os dados atualizam automaticamente ao mudar qualquer filtro. Para voltar ao estado original, clique em **Limpar filtros**.
 
 ### Sessão
 
-A sessão de login dura 60 minutos. Quando expirar, o sistema volta para a tela de login com um aviso. É só entrar novamente.
+A sessão dura 60 minutos. Quando expirar, o sistema volta para a tela de login. É só entrar de novo.
 
 ---
 
-## 6. Como parar e ligar o sistema
+## 5. Como parar e ligar o sistema
 
 ### Parar
 
@@ -191,7 +133,7 @@ A sessão de login dura 60 minutos. Quando expirar, o sistema volta para a tela 
 docker compose --env-file deploy/demo.env -f docker-compose.demo.yml down
 ```
 
-Os dados ficam salvos. Nada é perdido ao parar o sistema.
+Os dados ficam salvos. Nada é perdido.
 
 ### Ligar novamente
 
@@ -199,237 +141,112 @@ Os dados ficam salvos. Nada é perdido ao parar o sistema.
 docker compose --env-file deploy/demo.env -f docker-compose.demo.yml up -d
 ```
 
-Aguarde cerca de 30 segundos e acesse `http://127.0.0.1:8080`.
-
-### Reiniciar (se algo estiver estranho)
-
-```bash
-docker compose --env-file deploy/demo.env -f docker-compose.demo.yml down
-docker compose --env-file deploy/demo.env -f docker-compose.demo.yml up --build -d
-```
+Aguarde cerca de 30 segundos e acesse o endereço no navegador.
 
 ### Recomeçar do zero
 
-Se quiser apagar **todos os dados** e voltar ao estado inicial:
+Se quiser **apagar tudo** e reinstalar:
 
 ```bash
 docker compose --env-file deploy/demo.env -f docker-compose.demo.yml down -v
 ```
 
-Depois, rode o quick-start novamente:
+Depois, rode o instalador novamente.
 
-No Linux ou macOS:
-```bash
-python3 quick-start.py
-```
-
-No Windows:
-```powershell
-python quick-start.py
-```
-
-> **Atenção:** o comando `down -v` apaga tudo do banco de dados. Só use se realmente quiser recomeçar do zero.
+> **Atenção:** esse comando apaga todos os dados. Só use se realmente quiser recomeçar do zero.
 
 ---
 
-## 7. Como saber se está tudo certo
+## 6. Como saber se está tudo certo
 
-Use esta tabela para conferir passo a passo:
-
-| O que testar | Como fazer | O que você deve ver |
+| O que verificar | Como fazer | O que deve aparecer |
 |---|---|---|
-| Sistema acessível | Abra `http://127.0.0.1:8080` | Tela de login aparece |
-| Login funciona | Digite `admin@demo.local` / `demo1234` | Dashboard abre |
-| Indicadores carregam | Olhe os 3 cards no topo | Números de frete, ad valorem e ocorrências |
-| Gráficos aparecem | Role a tela para baixo | Gráficos de transportadora e destino |
-| Filtros respondem | Selecione qualquer filtro | Indicadores e gráficos mudam |
-
-Para verificar pelo terminal:
-
-```bash
-docker compose --env-file deploy/demo.env -f docker-compose.demo.yml ps
-```
-
-Todos os serviços devem mostrar `healthy` ou `running`.
+| Sistema acessível | Abrir o endereço no navegador | Tela de login |
+| Login funciona | Entrar com e-mail e senha | Dashboard abre |
+| Indicadores carregam | Olhar os 3 cards no topo | Números aparecem |
+| Gráficos aparecem | Rolar a tela | Gráficos visíveis |
+| Filtros respondem | Selecionar qualquer filtro | Dados mudam |
 
 ---
 
-## 8. Problemas comuns
+## 7. Problemas comuns
 
-### "Não consigo abrir a página no navegador"
+### "A página não abre"
 
-- O sistema pode ainda estar subindo. Aguarde 1 minuto e recarregue.
-- Confira se o Docker Desktop está aberto e rodando.
-- Verifique os containers:
-  ```bash
-  docker compose --env-file deploy/demo.env -f docker-compose.demo.yml ps
-  ```
+- O sistema pode estar subindo. Aguarde 1 minuto e recarregue.
+- Verifique se o Docker Desktop está aberto.
+- Tente o endereço alternativo: `http://127.0.0.1:8080`
 
 ### "O login não funciona"
 
-- Confira se está digitando exatamente: `admin@demo.local` e `demo1234`.
-- Se configurou manualmente (sem o quick-start), o usuário pode não ter sido criado. Execute:
+- Confirme: e-mail `admin@demo.local`, senha `demo1234`.
+- Se rodou a instalação manual, o usuário pode não ter sido criado. Execute:
   ```bash
   docker compose --env-file deploy/demo.env -f docker-compose.demo.yml exec backend python -m app.scripts.seed_admin --email admin@demo.local --full-name "Admin Demo" --password demo1234
   ```
 
-### "Dashboard mostra: Sem dados para exibir"
+### "Dashboard sem dados"
 
 - Clique em **Limpar filtros** — algum filtro pode estar restringindo demais.
-- Se o banco está vazio, rode o `quick-start.py` novamente.
+- Se o banco está vazio, rode o instalador novamente.
 
-### "A porta 8080 está ocupada"
+### "Porta 8080 ocupada"
 
-1. Abra o arquivo `deploy/demo.env` em um editor de texto
-2. Troque `DEMO_PORT=8080` por outra porta, como `DEMO_PORT=9090`
+1. Abra o arquivo `deploy/demo.env`
+2. Troque `DEMO_PORT=8080` por outra porta (ex: `9090`)
 3. Reinicie o sistema
-4. Acesse `http://127.0.0.1:9090`
 
-### "O quick-start.py deu erro"
+### "O instalador diz que falta Docker/Python/Git"
 
-- Confirme que o Docker Desktop está aberto e funcionando
-- Confirme que a internet está funcionando (necessário na primeira execução)
-- Veja os logs para mais detalhes:
-  ```bash
-  docker compose --env-file deploy/demo.env -f docker-compose.demo.yml logs
-  ```
+O instalador abre a página de download automaticamente. Instale o programa indicado, e depois rode o instalador de novo.
 
 ---
 
-## 9. Backup e recuperação
-
-O sistema possui ferramentas para proteger os dados do banco.
+## 8. Backup
 
 ### Fazer backup
-
-Com o sistema rodando, execute:
 
 ```bash
 python3 scripts/backup_postgres_compose.py --stack demo --env-file deploy/demo.env
 ```
 
-No Windows, troque `python3` por `python`.
+No Windows, use `python` em vez de `python3`.
 
-O backup será salvo na pasta `backups/demo/` com a data e hora no nome do arquivo.
+O backup é salvo em `backups/demo/`.
 
-### Restaurar um backup
+### Restaurar
 
-> **Atenção:** este comando substitui todos os dados atuais pelo conteúdo do backup.
+> **Atenção:** substitui todos os dados atuais.
 
 ```bash
 python3 scripts/restore_postgres_compose.py --stack demo --env-file deploy/demo.env --input backups/demo/NOME-DO-ARQUIVO.dump --yes-i-understand-this-will-overwrite-data
 ```
 
-Troque `NOME-DO-ARQUIVO` pelo nome real do arquivo de backup.
-
-### Restaurar backup criptografado
-
-Se o backup foi criptografado (nome termina em `.dump.enc`), configure a chave antes:
-
-No Linux ou macOS:
-```bash
-export BACKUP_ENCRYPTION_KEY="sua-chave-de-criptografia"
-```
-
-No Windows:
-```powershell
-$env:BACKUP_ENCRYPTION_KEY="sua-chave-de-criptografia"
-```
-
-Depois, execute o mesmo comando de restore usando o arquivo `.dump.enc`.
-
 ---
 
-## 10. Importar dados reais
+## 9. Importar dados reais
 
-Se a empresa quiser usar dados reais em vez dos dados de demonstração:
+Para usar dados reais da empresa:
 
-1. Prepare um arquivo CSV com estas colunas:
-   - Data do Embarque
-   - Origem
-   - Destino
-   - Valor da Carga (R$)
-   - Tipo de Veículo
-   - Transportadora
-   - Taxa Ad Valorem (%)
-   - Frete Peso (R$)
-
-2. Coloque o arquivo na pasta `backend/data/` do projeto
-
+1. Prepare um CSV com as colunas: Data do Embarque, Origem, Destino, Valor da Carga (R$), Tipo de Veículo, Transportadora, Taxa Ad Valorem (%), Frete Peso (R$)
+2. Coloque o arquivo em `backend/data/`
 3. Execute:
    ```bash
    docker compose --env-file deploy/demo.env -f docker-compose.demo.yml exec backend python -m app.scripts.import_shipments /app/data/nome-do-seu-arquivo.csv
    ```
 
-Os dados novos serão adicionados ao banco sem remover os que já existem.
+---
+
+## 10. Checklist
+
+- [ ] Rodei o instalador (`instalar.bat` ou `instalar.sh`)
+- [ ] O sistema mostrou "SISTEMA PRONTO!"
+- [ ] Consigo acessar no navegador
+- [ ] Consigo fazer login
+- [ ] Dashboard mostra indicadores e gráficos
+- [ ] Filtros funcionam
+- [ ] Sei como parar e ligar o sistema
 
 ---
 
-## 11. Checklist de verificação
-
-Use esta lista para confirmar que tudo está funcionando:
-
-- [ ] Docker Desktop instalado e aberto
-- [ ] Python 3 instalado
-- [ ] Git instalado
-- [ ] Executei o `quick-start.py` com sucesso
-- [ ] Consigo abrir `http://127.0.0.1:8080`
-- [ ] Consigo fazer login com `admin@demo.local` / `demo1234`
-- [ ] Indicadores e gráficos carregam no dashboard
-- [ ] Filtros funcionam e atualizam os dados
-- [ ] Sei como parar o sistema
-- [ ] Sei como ligar o sistema novamente
-
----
-
-## 12. Instalação manual (alternativa)
-
-Se o `quick-start.py` não funcionar no seu ambiente, você pode fazer a instalação passo a passo:
-
-**1.** Copie o arquivo de configuração:
-
-No Linux ou macOS:
-```bash
-cp deploy/demo.env.example deploy/demo.env
-```
-
-No Windows:
-```powershell
-Copy-Item deploy/demo.env.example deploy/demo.env
-```
-
-**2.** Abra `deploy/demo.env` em um editor de texto e troque o valor de `JWT_SECRET_KEY` por um texto longo (pelo menos 32 caracteres). Exemplo: `minha-chave-longa-aleatoria-segura-2026`
-
-**3.** Inicie o sistema:
-```bash
-docker compose --env-file deploy/demo.env -f docker-compose.demo.yml up --build -d
-```
-
-**4.** Aguarde cerca de 1 minuto
-
-**5.** Crie o usuário de acesso:
-```bash
-docker compose --env-file deploy/demo.env -f docker-compose.demo.yml exec backend python -m app.scripts.seed_admin --email admin@demo.local --full-name "Admin Demo" --password demo1234
-```
-
-**6.** Gere e importe os dados de demonstração:
-
-No Linux ou macOS:
-```bash
-python3 gerar_dataset_logistica_pe.py
-cp dataset_operacoes_logisticas_pe.csv backend/data/
-docker compose --env-file deploy/demo.env -f docker-compose.demo.yml exec backend python -m app.scripts.import_shipments /app/data/dataset_operacoes_logisticas_pe.csv
-```
-
-No Windows:
-```powershell
-python gerar_dataset_logistica_pe.py
-Copy-Item dataset_operacoes_logisticas_pe.csv backend/data/
-docker compose --env-file deploy/demo.env -f docker-compose.demo.yml exec backend python -m app.scripts.import_shipments /app/data/dataset_operacoes_logisticas_pe.csv
-```
-
-**7.** Acesse `http://127.0.0.1:8080` e faça login
-
----
-
-*Para ambientes de produção ou configurações avançadas, consulte `docs/production-readiness.md` e `docs/secrets-and-operational-config.md`.*
+*Para configurações avançadas, consulte `docs/production-readiness.md` e `docs/secrets-and-operational-config.md`.*
